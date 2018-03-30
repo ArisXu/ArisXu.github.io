@@ -147,10 +147,10 @@
             <blockquote>
 <p>强网杯组织了下新生们一起报了个名，菜如我是一题都做不出来。。<br>不过当时部分题还是有点思路的，赛后学长给我们讲了一些，再参考着题解的情况下，再做了一遍其中的几题，新手向所以写得非常详细（应该会继续更新</p>
 </blockquote>
-<h2 id="1-silent"><a href="#1-silent" class="headerlink" title="1.silent"></a>1.silent</h2><p>题如其名，打开跑一跑发现一点回显都没有,甩进IDA<br><img src="/img/main.png" alt="avatar"></p>
+<h2 id="1-silent"><a href="#1-silent" class="headerlink" title="1.silent"></a>1.silent</h2><p>题如其名，打开跑一跑发现一点回显都没有,甩进IDA<br><img src="/img/强网杯部分pwn复现/main.png" alt="avatar"></p>
 <p>main的逻辑非常简单，分别点进去看看就能明白三个函数的作用</p>
 <p>如果你了解过堆的话应该不难看出漏洞所在，但如果你不了解，下面我们就来学习一下这题的背景知识——堆(堆的内容很多，这里只说到能解决此题的程序，我也正在学习中…..</p>
-<p>下面这张图是chunk的结构图，接下来请务必牢记它的构成<br><img src="/img/chunk.png" alt="avatar"><br>那么什么是chunk呢，我们都知道我们可以使用malloc申请一块内存区域，而malloc的返回值就是指向申请到的内存地址的指针。现在向上看那张图，看到那个mem区块了没有，malloc返回地址就是这个地方，也就是说我们用malloc申请得到了一个chunk。</p>
+<p>下面这张图是chunk的结构图，接下来请务必牢记它的构成<br><img src="/img/强网杯部分pwn复现/chunk.png" alt="avatar"><br>那么什么是chunk呢，我们都知道我们可以使用malloc申请一块内存区域，而malloc的返回值就是指向申请到的内存地址的指针。现在向上看那张图，看到那个mem区块了没有，malloc返回地址就是这个地方，也就是说我们用malloc申请得到了一个chunk。</p>
 <p>接下来我们看一下chunk的构成：</p>
 <p>prev_size：前一个未被使用的chunk的大小</p>
 <p>size:当前chunk的大小(为了防止内存碎片过多，得到的chunk大小一定是8的倍数，比如申请7字节mem也会得到8字节mem，8的倍数写成二进制是? x 1000即最后三位一定是0，设计者为了节约空间，将这3bit用来存储其他信息，这道题我们不需要知道这3bit的作用只做了解)</p>
@@ -166,7 +166,7 @@
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">free(a);</span><br><span class="line">free(a);//double free异常退出</span><br></pre></td></tr></table></figure>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">free(a);</span><br><span class="line">free(b);</span><br><span class="line">free(a);//正常运行</span><br></pre></td></tr></table></figure>
 <p>这就说明fastbin的安全系数很低，比较容易被利用</p>
-<p>这题所利用的漏洞就是这里，下面我们回到题目里<br><img src="/img/add.png" alt="avatar"><br><img src="/img/dele.png" alt="avatar"></p>
+<p>这题所利用的漏洞就是这里，下面我们回到题目里<br><img src="/img/强网杯部分pwn复现/add.png" alt="avatar"><br><img src="/img/强网杯部分pwn复现/dele.png" alt="avatar"></p>
 <p>在delete()中我们可以free任何一个chunk无数次，只需要注意不连续free同一个chunk就行</p>
 <p>所以我们可以free(a);free(b);free(a);之后再重新malloc一个和a,b大小一样的chunk，这样就会从fastbin链表里返回原本a所使用的空间。现在的情况是，你申请到了一个依旧存在在fastbin链表里的chunk，即mem块的前几个字节被当做fd使用，而你现在可以修改这里的值从而伪造一个chunk到fastbin中！</p>
 <p>现在，不得不再提一个问题…malloc也是有安全检查的，并不是所有位置都可以被你拿来覆盖fd，你必须保证伪造的chunk的size是合法的，比如<br>malloc(0x20)返回一个size为0x30的chunk(0x10的头部,64位)那么你伪造的chunk的size范围就是0x30~0x37，所以要找到一个”\x00\x00\x00\x3?”的地方作为size才能成功得到这个chunk</p>
