@@ -155,7 +155,7 @@
 <p>大佬们去打tctf了，pwn题没有人做，当时心里想的是至少也要扛起担子做个一题吧，然而现实是残酷的<em>(:з」∠)</em>没一题会做。。。。最后还是v爷爷回来秒掉一题，这两题是里面比较简单和普通的题，写篇博客记录一下</p>
 </blockquote>
 <h2 id="1-Heap"><a href="#1-Heap" class="headerlink" title="1.Heap"></a>1.Heap</h2><p>程序的关键点都在下面</p>
-<p><img src="/img/suctf/Heap.png" alt="avatar"></p>
+<p><img src="/img/suctf/heap.png" alt="avatar"></p>
 <p>和普通的堆题相比，这里会连续生成两个相同大小的chunk，用read读到第一个chunk里并strcpy到第二个中，随后free掉第一个，也就是把第一个当做缓冲区用。</p>
 <p>注意这里用read读取字符串而用strcpy来拷贝字符串，前后的长度无法保证一致，事实上如果写满直到下一个chunk的prev_size就可以把下一个chunk的size一起copy过去，而edit函数利用strlen来确定字符串长度，这样就可以随意修改下一个chunk的size了，这时如果伪造一个chunk出来，就可以通过unlink获得heap地址，而且可以通过edit随意修改为所欲为</p>
 <p>现在看来的确是一个简单的题目了，看来本人还是缺乏一些自主思考的能力，可能是面向wp解题太多了的问题，急需提升！</p>
